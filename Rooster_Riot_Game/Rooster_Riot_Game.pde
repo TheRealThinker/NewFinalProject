@@ -113,6 +113,54 @@ void draw() {
         clear();
       }
     }
+
+    // Chicken shop button
+    fill(255);
+    rect(275, 550, 150, 50);
+    fill(0);
+    text("The Coop", 350, 585);
+    if (mousePressed) {
+      if (abs(mouseX-350)<75 && abs(mouseY-585)<100) {
+        gameScreen = 4;
+        clear();
+      }
+    }
+
+    // Roster button
+    fill(255);
+    rect(925, 550, 150, 50);
+    fill(0);
+    text("Roster", 1000, 585);
+    if (mousePressed) {
+      if (abs(mouseX-1000)<75 && abs(mouseY-585)<585) {
+        gameScreen = 5;
+        clear();
+      }
+    }
+
+    // Option button
+    fill(255);
+    rect(975, 20, 150, 50);
+    fill(0);
+    text("Option", 1050, 55);
+    if (mousePressed) {
+      if (abs(mouseX-1050)<75 && abs(mouseY-585)<55) {
+        gameScreen = 6;
+        clear();
+      }
+    }
+    // "Riot" button
+    fill(255);
+    rect(450, 350, 300, 100);
+    textFont(title, 60);
+    fill(0);
+    text("RIOT!", 600, 425);
+    if (mousePressed) {
+      if (abs(mouseX-600)<150 && abs(mouseY-425)<50) {
+        gameScreen = 7;
+        clear();
+      }
+    }
   }
 
   // Shop
@@ -121,6 +169,13 @@ void draw() {
     text("Money: $" +money, 100, 40);
     debt();
 
+    rect(1000, 25, 150, 50);
+    fill(0);
+    text("Back", 1075, 60);
+
+
+    rect(100, 620, 150, 50);
+    fill(0);
     image(storeKeep, 50, 300, 350, 350);
 
     textFont(text, 28);
@@ -142,6 +197,44 @@ void draw() {
   }
 
   if (gameScreen == 4) {
+    textFont(text, 28); 
+    text("Money: $" +money, 100, 40);
+    debt();
+
+    rect(1000, 25, 150, 50);
+    fill(0);
+    text("Back", 1075, 60);
+
+    fill(255);
+    text("I've got the best fighting birds in Kentucky!", 350, 100);
+  }
+
+  if (gameScreen == 5) {
+  }
+
+  if (gameScreen == 6) {
+    rect(100, 25, 150, 50);
+    fill(0);
+    text("Back", 175, 60);
+
+    textFont(title, 60);
+    fill(255);
+    text("Options", 600, 100);
+
+    textFont(text, 28);
+    rect(450, 300, 150, 100);
+    fill(0);
+    text("Restart", 600, 350);
+
+    rect(450, 500, 150, 100);
+    fill(0);
+    text("Restart", 600, 550);
+  }
+
+  if (gameScreen == 7) {
+  }
+
+  if (gameScreen == 10) {
     textFont(title, 60);
     fill(#AD2D2D);
     text("YOU LOSE!", 600, 50);
@@ -164,17 +257,37 @@ void draw() {
 
 void mouseReleased() {
   // Feed hitbox
-  if (abs(mouseX-400)<50 && abs(mouseY-250)<125) {
-    feed += 1;
-    money -= 100;
+  if (gameScreen == 3) {
+    if (abs(mouseX-400)<50 && abs(mouseY-250)<125) {
+      feed += 1;
+      money -= 100;
+    }
   }
 
   // Steroid hitbox
-  if (abs(mouseX-550)<50 && abs(mouseY-250)<125) {
-    steroids += 1;
-    money -= 300;
+  if (gameScreen == 3) {
+    if (abs(mouseX-550)<50 && abs(mouseY-250)<125) {
+      steroids += 1;
+      money -= 300;
+    }
+  }
+
+  // Back button
+  if (gameScreen == 3 || gameScreen == 4 || gameScreen == 5) {
+    if (abs(mouseX-1075)<75 && abs(mouseY-50)<25) {
+      gameScreen = 2;
+      clear();
+    }
+  }
+
+  if (gameScreen == 6) {
+    if (abs(mouseX-175)<75 && abs(mouseY-50)<25) {
+      gameScreen = 2;
+      clear();
+    }
   }
 }
+
 
 // Detects debt and warns the player
 // Also makes "debt ending"
@@ -189,7 +302,7 @@ void debt() {
   }
 
   if (debtEnding == true) {
-    gameScreen = 4;
+    gameScreen = 10;
     ending = "The bank shut down your operation.";
   }
 }
