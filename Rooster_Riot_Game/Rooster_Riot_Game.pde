@@ -153,9 +153,10 @@ void draw() {
     text("Money: $" +money, 100, 40);
     debt();
 
-    rect(1000, 25, 150, 50);
+   
+    rect(1000, 55, 150, 50);
     fill(0);
-    text("Back", 1075, 60);
+    text("Back", 1075, 90);
 
 
     rect(100, 620, 150, 50);
@@ -171,13 +172,15 @@ void draw() {
     textFont(desc, 18);
     text("Chicken Feed", 400, 350);
     text("$100", 400, 375);
-    text("Inventory: " +feed, 400, 400);
+    text("Heals injuries", 400, 400);
+    text("Inventory: " +feed, 400, 450);
 
     image(steroidpic, 550, 250, 100, 100);
     textFont(desc, 18);
     text("Illegal Steroids", 550, 350);
     text("$300", 550, 375);
-    text("Inventory: " +steroids, 550, 400);
+    text("Increases skill", 550, 400);
+    text("Inventory: " +steroids, 550, 450);
   }
 
   if (gameScreen == 4) {
@@ -185,9 +188,9 @@ void draw() {
     text("Money: $" +money, 100, 40);
     debt();
 
-    rect(1000, 25, 150, 50);
+    rect(1000, 55, 150, 50);
     fill(0);
-    text("Back", 1075, 60);
+    text("Back", 1075, 90);
 
     fill(255);
     text("I've got the best fighting birds in Kentucky!", 350, 100);
@@ -197,9 +200,11 @@ void draw() {
   }
 
   if (gameScreen == 6) {
-    rect(100, 25, 150, 50);
+    textFont(text, 28);
+    fill(255);
+    rect(1000, 55, 150, 50);
     fill(0);
-    text("Back", 175, 60);
+    text("Back", 1075, 90);
 
     textFont(title, 60);
     fill(255);
@@ -259,7 +264,7 @@ void mouseReleased() {
 
   // Back button
   if (gameScreen == 3 || gameScreen == 4 || gameScreen == 5 || gameScreen == 6) {
-    if (abs(mouseX-1075)<75 && abs(mouseY-50)<25) {
+    if (abs(mouseX-1075)<75 && abs(mouseY-55)<50) {
       gameScreen = 2;
       clear();
     }
