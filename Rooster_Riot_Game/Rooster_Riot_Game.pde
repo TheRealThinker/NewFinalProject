@@ -131,36 +131,20 @@ void draw() {
     rect(925, 550, 150, 50);
     fill(0);
     text("Roster", 1000, 585);
-    if (mousePressed) {
-      if (abs(mouseX-1000)<75 && abs(mouseY-585)<585) {
-        gameScreen = 5;
-        clear();
-      }
-    }
+
 
     // Option button
     fill(255);
     rect(975, 20, 150, 50);
     fill(0);
     text("Option", 1050, 55);
-    if (mousePressed) {
-      if (abs(mouseX-1050)<75 && abs(mouseY-585)<55) {
-        gameScreen = 6;
-        clear();
-      }
-    }
-    // "Riot" button
+
+
     fill(255);
     rect(450, 350, 300, 100);
     textFont(title, 60);
     fill(0);
     text("RIOT!", 600, 425);
-    if (mousePressed) {
-      if (abs(mouseX-600)<150 && abs(mouseY-425)<50) {
-        gameScreen = 7;
-        clear();
-      }
-    }
   }
 
   // Shop
@@ -222,13 +206,14 @@ void draw() {
     text("Options", 600, 100);
 
     textFont(text, 28);
-    rect(450, 300, 150, 100);
+    rect(450, 300, 300, 100);
     fill(0);
     text("Restart", 600, 350);
 
-    rect(450, 500, 150, 100);
+    fill(255);
+    rect(450, 500, 300, 100);
     fill(0);
-    text("Restart", 600, 550);
+    text("Quit", 600, 550);
   }
 
   if (gameScreen == 7) {
@@ -273,17 +258,54 @@ void mouseReleased() {
   }
 
   // Back button
-  if (gameScreen == 3 || gameScreen == 4 || gameScreen == 5) {
+  if (gameScreen == 3 || gameScreen == 4 || gameScreen == 5 || gameScreen == 6) {
     if (abs(mouseX-1075)<75 && abs(mouseY-50)<25) {
       gameScreen = 2;
       clear();
     }
   }
 
-  if (gameScreen == 6) {
-    if (abs(mouseX-175)<75 && abs(mouseY-50)<25) {
-      gameScreen = 2;
+  // Roster button
+  if (gameScreen == 2) {
+    if (abs(mouseX-1050)<75 && abs(mouseY-45)<25) {
+      gameScreen = 6;
       clear();
+    }
+  }
+
+  // Options button
+  if (gameScreen == 2) {
+    if (abs(mouseX-600)<150 && abs(mouseY-425)<50) {
+      gameScreen = 7;
+      clear();
+    }
+  }
+
+  // Riot! button
+  if (gameScreen == 2) {
+    if (abs(mouseX-600)<150 && abs(mouseY-400)<50) {
+      gameScreen = 7;
+      clear();
+    }
+  }
+
+  // Restart button (Options)
+  if (gameScreen == 6) {
+    if (abs(mouseX-600)<150 && abs(mouseY-350)<50) {
+      gameScreen = 0;
+      money = 1500;
+      feed = 3;
+      steroids = 0;
+      ending = "null";
+      debtEnding = false;
+      clear();
+    }
+  }
+
+  // Quit button (Options)
+  if (gameScreen == 6) {
+    if (abs(mouseX-600)<150 && abs(mouseY-550)<50) {
+      exit();
     }
   }
 }
