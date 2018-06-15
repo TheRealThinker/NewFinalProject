@@ -481,7 +481,7 @@ void mouseReleased() {
     }
 
     // Bet $1000
-    if (abs(mouseX-600)<100 && abs(mouseY-600)<100) {
+    if (abs(mouseX-900)<100 && abs(mouseY-600)<100) {
       money -= 1000;
       betMoney += 1000;
     }
