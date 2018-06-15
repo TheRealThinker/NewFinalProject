@@ -2,12 +2,14 @@
 // Made by Sam
 
 PImage[] rooster = new PImage[8];
+
 PImage storeKeep;
+
 PImage startRooster;
-PImage enemyRooster;
+
 PImage farmer;
+
 PImage fightVS;
-PImage arrow;
 
 PImage feedpic;
 int feed;
@@ -21,48 +23,60 @@ int antibiotics;
 PImage charm;
 int charms;
 
-PImage chateau;
-
 PFont title;
+
 PFont text;
+
 PFont desc;
 
 int gameScreen;
 
 int money;
-int betMoney;
 
 int baseSkill;
-int playerSkill;
-int totalSkill;
 
-int roosterPic;
-int roosterGen;
+int playerGen;
+int playerGenrooster;
+
+int starterRooster;
+
+int playerSkill;
 
 String ending;
 
-String roosterName;
-int nameGen;
+String playerName;
+String roosterName1;
+String roosterName2;
+String roosterName3;
 
+String myText;
+
+
+
+float injuryChance;
+float infectionChance;
+
+Boolean feedUsed;
+Boolean steroidsUsed;
+Boolean antibioticsUsed;
+
+Boolean injury;
+Boolean infection;
 Boolean debtEnding;
-Boolean winEnding;
-Boolean matchWon;
-Boolean matchLost;
 
+Boolean fight;
+Boolean fightOver;
 
 void setup() {
 
   storeKeep = loadImage("chadrooster.png");
   startRooster = loadImage("startrooster.png");
-  enemyRooster = loadImage("enemyrooster.jpg");
   feedpic = loadImage("feed.png");
   steroidpic = loadImage("steroids.jpeg");
   antibioticspic = loadImage("antibiotics.jpg");
   charm = loadImage("charm.jpg");
   farmer = loadImage("farmer.jpg");
   fightVS = loadImage("vs.jpg");
-  arrow = loadImage("rightarrow.png");
-  chateau = loadImage("chateau.jpg");
 
   rooster[0] = loadImage("rooster1.png");
   rooster[1] = loadImage("rooster2.png");
@@ -83,17 +97,17 @@ void setup() {
   antibiotics = 2;
   charms = 0;
   baseSkill = 50;
-  playerSkill = 0;
 
+  injuryChance = 0;
+  infectionChance = 0;
 
 
   ending = "null";
 
-  debtEnding = false;
-  matchWon = false;
-  matchLost = false;
-  winEnding = false;
+  injury = false;
+  infection = false;
 
+  debtEnding = false;
 
 
   size(1200, 700);
@@ -104,9 +118,6 @@ void draw() {
 
   imageMode(CENTER);
   textAlign(CENTER);
-
-  winEnding();
-  totalSkill = baseSkill + playerSkill;
 
   textFont(title, 60);
 
@@ -163,11 +174,11 @@ void draw() {
       }
     }
 
-    // Inventory button
+    // Chicken shop button
     fill(255);
     rect(275, 550, 150, 50);
     fill(0);
-    text("Inventory", 350, 585);
+    text("The Coop", 350, 585);
     if (mousePressed) {
       if (abs(mouseX-350)<75 && abs(mouseY-585)<100) {
         gameScreen = 4;
@@ -175,18 +186,18 @@ void draw() {
       }
     }
 
-    // "My Rooster" button
+    // Roster button
     fill(255);
     rect(925, 550, 150, 50);
     fill(0);
-    text("My Rooster", 1000, 585);
+    text("My Chicken", 1000, 585);
 
 
     // Option button
     fill(255);
     rect(975, 20, 150, 50);
     fill(0);
-    text("Options", 1050, 55);
+    text("Option", 1050, 55);
 
 
     fill(255);
@@ -196,16 +207,16 @@ void draw() {
     text("RIOT!", 600, 425);
   }
 
-  // Shop screen
+  // Shop
   if (gameScreen == 3) {
     textFont(text, 28);
     text("Money: $" +money, 100, 40);
     debt();
 
 
-    rect(1000, 90, 150, 50);
+    rect(1000, 55, 150, 50);
     fill(0);
-    text("Back", 1075, 125);
+    text("Back", 1075, 90);
 
 
     rect(100, 620, 150, 50);
@@ -246,53 +257,42 @@ void draw() {
     text("Inventory: " +charms, 850, 450);
   }
 
-// W.I.P. Screen
   if (gameScreen == 4) {
-    textFont(text, 28);
-    rect(1000, 90, 150, 50);
-    fill(0);
-    text("Back", 1075, 125);
-
-    fill(255);
-    text("Come back later! (Gone fighting)", 600, 350);
-  }
-// "My Chicken" Screen
-  if (gameScreen == 5) {
-    roosterAppearance();
-
-    textFont(text, 28);
+    textFont(text, 28); 
     text("Money: $" +money, 100, 40);
     debt();
 
-    textFont(text, 28);
-    fill(255);
-    rect(1000, 90, 150, 50);
+    rect(1000, 55, 150, 50);
     fill(0);
-    text("Back", 1075, 125);
+    text("Back", 1075, 90);
 
     fill(255);
-    text("Name: " +roosterName, 600, 100);
-    image(arrow, 800, 100, 100, 100);
-
-    image(rooster[roosterPic], 600, 200, 200, 200);
-    image(arrow, 800, 350, 100, 100);
-
-    text("Skill: " +playerSkill, 600, 400);
+    text("Come back later! (closed)", 600, 350);
   }
 
-// Options screen
+  if (gameScreen == 5) {
+    textFont(text, 28);
+    fill(255);
+    rect(1000, 55, 150, 50);
+    fill(0);
+    text("Back", 1075, 90);
+
+    playerRooster();
+  }
+
   if (gameScreen == 6) {
     textFont(text, 28);
     fill(255);
-    rect(1000, 90, 150, 50);
+    rect(1000, 55, 150, 50);
     fill(0);
-    text("Back", 1075, 125);
+    text("Back", 1075, 90);
 
     textFont(title, 60);
     fill(255);
     text("Options", 600, 100);
 
     textFont(text, 28);
+    fill(255);
     rect(450, 300, 300, 100);
     fill(0);
     text("Restart", 600, 350);
@@ -304,36 +304,6 @@ void draw() {
   }
 
   if (gameScreen == 7) {
-    textFont(text, 28);
-    fill(255);
-    rect(1000, 90, 150, 50);
-    fill(0);
-    text("Back", 1075, 125);
-
-    roosterAppearance();
-    fight();
-  } 
-
-  if (gameScreen == 8) {
-    textFont(text, 28);
-    fill(255);
-    rect(1000, 90, 150, 50);
-    fill(0);
-    text("Back", 1075, 125); 
-
-
-    matchResults();
-  }
-
-// Win screen
-  if (gameScreen == 9) {
-    textFont(title, 48);
-    fill(255);
-    text("You have earned enough money to live in House Rooster!", 600, 200);
-
-    image(chateau, 600, 400, 200, 200);
-
-    text("You have won!", 600, 600);
   }
 
   if (gameScreen == 10) {
@@ -349,22 +319,14 @@ void draw() {
         money = 1500;
         feed = 3;
         steroids = 0;
-        antibiotics = 2;
-        betMoney = 0;
-        nameGen = 0;
-        roosterGen = 0;
         ending = "null";
         debtEnding = false;
-        matchWon = false;
-        matchLost = false;
-        winEnding = false;
         clear();
       }
     }
   }
 }
 
-// Makes buttons work (hitboxes for click)
 void mouseReleased() {
   // Feed hitbox
   if (gameScreen == 3) {
@@ -398,19 +360,30 @@ void mouseReleased() {
     }
   }
 
+  // Chicken name changer
+  if (gameScreen == 5) {
+    if (abs(mouseX-850)<50 && abs(mouseY-250)<125) {
+      playerGen += 1;
+    }
+  }
+
+  // Chicken appearance changer
+  if (gameScreen == 5) {
+    if (abs(mouseX-850)<50 && abs(mouseY-250)<125) {
+      playerGenrooster += 1;
+    }
+  }
+
   // Back button
-  if (gameScreen == 3 || gameScreen == 4 || gameScreen == 5 || gameScreen == 6 || gameScreen == 7 || gameScreen == 8) {
-    if (abs(mouseX-1075)<75 && abs(mouseY-90)<50) {
+  if (gameScreen == 3 || gameScreen == 4 || gameScreen == 5 || gameScreen == 6) {
+    if (abs(mouseX-1075)<75 && abs(mouseY-55)<50) {
       gameScreen = 2;
-      betMoney -= betMoney;
-      loop();
-      clear();
     }
   }
 
   // "My Chicken" button
   if (gameScreen == 2) {
-    if (abs(mouseX-1000)<75 && abs(mouseY-550)<50) {
+    if (abs(mouseX-1000)<75 && abs(mouseY-600)<50) {
       gameScreen = 5;
       clear();
     }
@@ -418,7 +391,7 @@ void mouseReleased() {
 
   // Options button
   if (gameScreen == 2) {
-    if (abs(mouseX-1050)<150 && abs(mouseY-20)<50) {
+    if (abs(mouseX-600)<150 && abs(mouseY-100)<50) {
       gameScreen = 6;
       clear();
     }
@@ -426,7 +399,7 @@ void mouseReleased() {
 
   // Riot! button
   if (gameScreen == 2) {
-    if (abs(mouseX-600)<150 && abs(mouseY-400)<50) {
+    if (abs(mouseX-1050)<150 && abs(mouseY-55)<50) {
       gameScreen = 7;
       clear();
     }
@@ -451,46 +424,6 @@ void mouseReleased() {
       exit();
     }
   }
-
-  // Name changer
-  if (gameScreen == 5) {
-    if (abs(mouseX-800)<100 && abs(mouseY-100)<100) {
-      nameGen += 1;
-    }
-
-    if (nameGen > 11) {
-      nameGen = 0;
-    }
-  }
-
-  // Picture changer
-  if (gameScreen == 5) {
-    if (abs(mouseX-800)<100 && abs(mouseY-350)<100) {
-      roosterGen += 1;
-    }
-    if (roosterGen > 11) {
-      roosterGen = 0;
-    }
-  }
-
-  // Bet $100 button
-  if (gameScreen == 7) {
-    if (abs(mouseX-300)<100 && abs(mouseY-600)<100) {
-      money -= 100;
-      betMoney += 100;
-    }
-
-    // Bet $1000
-    if (abs(mouseX-600)<100 && abs(mouseY-600)<100) {
-      money -= 1000;
-      betMoney += 1000;
-    }
-
-    // Fight! button
-    if (abs(mouseX-600)<100 && abs(mouseY-600)<100) {
-      gameScreen = 8;
-    }
-  }
 }
 
 
@@ -513,150 +446,205 @@ void debt() {
   }
 }
 
-// Changes rooster's name and "skin"
-void roosterAppearance() {
+void playerAppearance() {
 
-  // Rooster name options
-  if (nameGen == 0) {
-    roosterName = "Pecker";
+  if (playerGen == 0) {
+    playerName = "Peckers";
   }
 
-  if (nameGen == 1) {
-    roosterName = "Gord";
+  if (playerGen == 1) {
+    playerName = "Pecky";
   }
 
-  if (nameGen == 2) {
-    roosterName = "Scratchy";
+  if (playerGen == 2) {
+    playerName = "Scratcher";
   }
 
-  if (nameGen == 3) {
-    roosterName = "Chuck";
+  if (playerGen == 3) {
+    playerName = "Talon";
   }
 
-  if (nameGen == 4) {
-    roosterName = "Maximus";
+  if (playerGen == 4) {
+    playerName = "Flappy";
   }
 
-  if (nameGen == 5) {
-    roosterName = "Rudy";
+  if (playerGen == 5) {
+    playerName = "Jumbo";
   }
 
-  if (nameGen == 6) {
-    roosterName = "Dean";
+  if (playerGen == 6) {
+    playerName = "Bill";
   }
 
-  if (nameGen == 7) {
-    roosterName = "Talon";
+  if (playerGen == 7) {
+    playerName = "Carlton";
   }
 
-  if (nameGen == 8) {
-    roosterName = "Cooper";
+  if (playerGen == 8) {
+    playerName = "Dumbo";
   }
 
-  if (nameGen == 9) {
-    roosterName = "Squaky";
+  if (playerGen == 9) {
+    playerName = "Earl";
   }
 
-  if (nameGen == 10) {
-    roosterName = "Kyle";
+  if (playerGen == 10) {
+    playerName = "Bo";
   }
 
-  // Rooster picture options
-  if (roosterGen == 0) {
-    roosterPic = 0;
+  if (playerGen == 11) {
+    playerName = "Hurk";
   }
 
-  if (roosterGen == 1) {
-    roosterPic = 1;
+  if (playerGen == 12) {
+    playerName = "Sassy";
   }
 
-  if (roosterGen == 2) {
-    roosterPic = 2;
+  if (playerGen == 13) {
+    playerName = "Fiesty";
   }
 
-  if (roosterGen == 3) {
-    roosterPic = 3;
+  if (playerGen == 14) {
+    playerName = "Richy";
   }
 
-  if (roosterGen == 4) {
-    roosterPic = 4;
+  if (playerGen == 15) {
+    playerName = "Winner";
   }
 
-  if (roosterGen == 5) {
-    roosterPic = 5;
+  if (playerGen == 16) {
+    playerName = "Larry";
   }
 
-  if (roosterGen == 6) {
-    roosterPic = 6;
+  if (playerGen == 17) {
+    playerName = "Xavier";
   }
 
-  if (roosterGen == 7) {
-    roosterPic = 7;
+  if (playerGen == 18) {
+    playerName = "Buck";
+  }
+
+  if (playerGen == 19) {
+    playerName = "Aaron";
+  }
+
+  if (playerGen == 20) {
+    playerName = "Maurice";
+  }
+
+  if (playerGen > 20) {
+    playerGen = 0;
+  }
+
+  // Rooster Appearance
+  if (playerGenrooster == 0) {
+    starterRooster = 1;
+  }
+
+  if (playerGenrooster == 1) {
+    starterRooster = 2;
+  }
+
+  if (playerGenrooster == 2) {
+    starterRooster = 3;
+  }
+
+  if (playerGenrooster == 3) {
+    starterRooster = 4;
+  }
+
+  if (playerGenrooster == 4) {
+    starterRooster = 5;
+  }
+
+  if (playerGenrooster == 5) {
+    starterRooster = 6;
+  }
+
+  if (playerGenrooster == 6) {
+    starterRooster = 7;
+  }
+
+  if (playerGenrooster > 6) {
+    playerGenrooster = 0;
   }
 }
 
-// Generates the Riot! screen
-void fight() {
+void playerRooster() {
 
-  if (gameScreen == 7) {
+  if (gameScreen == 5) {
     fill(255);
-    text("" +roosterName, 150, 200);
-    image(rooster[roosterGen], 150, 450, 200, 200);
+    textFont(text, 28);
+    text("Name: " +playerName, 600, 200);
 
-    image(fightVS, 600, 350, 150, 150);
+    image(rooster[starterRooster], 600, 400, 150, 150);
 
-    text("Enemy rooster", 1050, 200);
-    image(enemyRooster, 1050, 450, 200, 200);
+    text("Skill: " +playerSkill, 600, 500);
 
-    text("Bet $100", 300, 600);
-    text("Bet $1000", 900, 600);
+    if (injury == true) {
+      fill(#AD2D2D);
+      text("Injured", 600, 550);
+    }
 
-    text("Your Bet: " +betMoney, 600, 100);
-
-    fill(255);
-    rect(500, 500, 200, 100);
-    textFont(title, 60);
-    fill(0);
-    text("Fight!", 600, 600);
-  }
-}
-
-// Generates match results (win or loss)
-void matchResults() {
-
-  if (abs(random(101)-totalSkill)<50) {
-    matchWon = true;
-    matchLost = false;
-  }
-  if (abs(random(101)-totalSkill)>=50) {
-    matchWon = false;
-    matchLost = true;
-  }
-  if (matchWon == true) {
-    if (matchLost == false) {
-      money = money + betMoney*2;
-      textFont(title, 48);
-      fill(#35AA51);
-      text("Match result: WON", 600, 250);
-      text("You now have $" +money, 600, 400);
+    if (infection == true) {
+      fill(#5C953B);
+      text("Infected wound", 600, 600);
     }
   }
-  if (matchWon == false) {
-    if (matchLost == true) {
-      betMoney = 0;
-      textFont(title, 48);
-      fill(#C62A35);
-      text("Match result: LOST", 600, 250);
-      text("You lost your betting money!", 600, 400);
-      text("Better luck next time.", 600, 500);
-    }
-  }
-  noLoop();
 }
 
-// Redirects player to win screen
-void winEnding() {
-  if (money >+ 10000) {
-    gameScreen = 9;
+void injuryMechanic() {
+  if (fightOver == true) {
+    float injuryChance = random(101);
   }
+
+  if (injuryChance <= 50) {
+    injury = false;
+  }
+
+  if (injuryChance > 50) {
+    injury = true;
+  }
+
+  if (injury == true) {
+    playerSkill = playerSkill - 20;
+  }
+
+  if (feedUsed == true) {
+    injury = false;
+    feed -= 1;
+  }
+}
+
+void infectionMechanic() {
+  if (fightOver == true) {
+    if (injury == true) {
+      float infectionChance = random(101);
+    }
+  }
+
+  if (infectionChance <= 75) {
+    infection = false;
+  }
+
+  if (injuryChance > 75) {
+    infection = true;
+  }
+
+  if (injury == true) {
+    fight = false;
+  }
+
+  if (antibioticsUsed == true) {
+    infection = false;
+  }
+}
+
+void steroidsMechanic() {
+  if (steroidsUsed == true) {
+    playerSkill += 1; 
+    steroids -= 1;
+  }
+
+  steroidsUsed = false;
 }
