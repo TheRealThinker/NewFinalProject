@@ -32,12 +32,16 @@ int gameScreen;
 int money;
 int betMoney;
 
-int baseSkill;
-int playerSkill;
-int totalSkill;
+int injury;
 
 int roosterPic;
 int roosterGen;
+
+float baseSkill;
+float playerSkill;
+float totalSkill;
+
+float chance;
 
 String ending;
 
@@ -46,8 +50,15 @@ int nameGen;
 
 Boolean debtEnding;
 Boolean winEnding;
+
 Boolean matchWon;
 Boolean matchLost;
+
+Boolean feedUsed;
+Boolean steroidsUsed;
+
+
+
 
 
 void setup() {
@@ -82,19 +93,22 @@ void setup() {
   steroids = 0;
   antibiotics = 2;
   charms = 0;
-  baseSkill = 50;
+  steroidsUsed = false;
+  baseSkill = 0.5;
   playerSkill = 0;
 
-
+  injury = 0;
 
   ending = "null";
+
+
+  feedUsed = false;
+  steroidsUsed = false;
 
   debtEnding = false;
   matchWon = false;
   matchLost = false;
   winEnding = false;
-
-
 
   size(1200, 700);
 }
@@ -106,7 +120,7 @@ void draw() {
   textAlign(CENTER);
 
   winEnding();
-  totalSkill = baseSkill + playerSkill;
+  totalSkill();
 
   textFont(title, 60);
 
@@ -156,24 +170,11 @@ void draw() {
     fill(0);
     text("Shop", 150, 585);
 
-    if (mousePressed) {
-      if (abs(mouseX-150)<75 && abs(mouseY-585)<75) {
-        gameScreen = 3;
-        clear();
-      }
-    }
-
     // Inventory button
     fill(255);
     rect(275, 550, 150, 50);
     fill(0);
     text("Inventory", 350, 585);
-    if (mousePressed) {
-      if (abs(mouseX-350)<75 && abs(mouseY-585)<100) {
-        gameScreen = 4;
-        clear();
-      }
-    }
 
     // "My Rooster" button
     fill(255);
@@ -181,14 +182,13 @@ void draw() {
     fill(0);
     text("My Rooster", 1000, 585);
 
-
     // Option button
     fill(255);
     rect(975, 20, 150, 50);
     fill(0);
     text("Options", 1050, 55);
 
-
+    // RIOT! button
     fill(255);
     rect(450, 350, 300, 100);
     textFont(title, 60);
@@ -246,20 +246,59 @@ void draw() {
     text("Inventory: " +charms, 850, 450);
   }
 
-// W.I.P. Screen
+  // Inventory Screen
   if (gameScreen == 4) {
+    steroidsUsed();
+    healthStates();
+
+    fill(255);
+    textFont(text, 28);
+    text("Money: $" +money, 100, 40);
+    debt();
+
     textFont(text, 28);
     rect(1000, 90, 150, 50);
     fill(0);
     text("Back", 1075, 125);
 
     fill(255);
-    text("Come back later! (Gone fighting)", 600, 350);
+    textFont(title, 48);
+    text("Inventory", 600, 100);
+    textFont(text, 28);
+    text("Click on item to consume", 600, 175);
+
+    image(feedpic, 400, 250, 100, 100);
+    textFont(desc, 18);
+    text("Chicken Feed", 400, 350);
+    text("Inventory: " +feed, 400, 375);
+
+
+    fill(255);
+    image(steroidpic, 550, 250, 100, 100);
+    textFont(desc, 18);
+    text("Illegal Steroids", 550, 350);
+    text("Inventory: " +steroids, 550, 375);
+
+    fill(255);
+    image(antibioticspic, 700, 250, 100, 100);
+    textFont(desc, 18);
+    text("Antibiotics", 700, 350);
+    text("Inventory: " +antibiotics, 700, 375);
+
+    fill(255);
+    image(charm, 850, 250, 100, 100);
+    textFont(desc, 18);
+    text("Charm", 850, 350);
+    text("Inventory: " +charms, 850, 375);
   }
-// "My Chicken" Screen
+  // "My Chicken" Screen
   if (gameScreen == 5) {
     roosterAppearance();
+    steroidsUsed();
+    totalSkill();
+    healthStates();
 
+    fill(255);
     textFont(text, 28);
     text("Money: $" +money, 100, 40);
     debt();
@@ -277,10 +316,10 @@ void draw() {
     image(rooster[roosterPic], 600, 200, 200, 200);
     image(arrow, 800, 350, 100, 100);
 
-    text("Skill: " +playerSkill, 600, 400);
+    text("Skill: " +totalSkill*100, 600, 400);
   }
 
-// Options screen
+  // Options screen
   if (gameScreen == 6) {
     textFont(text, 28);
     fill(255);
@@ -304,6 +343,7 @@ void draw() {
   }
 
   if (gameScreen == 7) {
+
     textFont(text, 28);
     fill(255);
     rect(1000, 90, 150, 50);
@@ -325,7 +365,7 @@ void draw() {
     matchResults();
   }
 
-// Win screen
+  // Win screen
   if (gameScreen == 9) {
     textFont(title, 48);
     fill(255);
@@ -366,7 +406,22 @@ void draw() {
 
 // Makes buttons work (hitboxes for click)
 void mouseReleased() {
-  // Feed hitbox
+  // Shop button
+  if (gameScreen == 2) {
+    if (abs(mouseX-150)<75 && abs(mouseY-585)<75) {
+      gameScreen = 3;
+      clear();
+    }
+  }
+
+  // Inventory button
+  if (gameScreen == 2) {
+    if (abs(mouseX-350)<75 && abs(mouseY-585)<100) {
+      gameScreen = 4;
+      clear();
+    }
+  }
+  // Feed hitbox (Shop)
   if (gameScreen == 3) {
     if (abs(mouseX-400)<50 && abs(mouseY-250)<125) {
       feed += 1;
@@ -374,7 +429,17 @@ void mouseReleased() {
     }
   }
 
-  // Steroid hitbox
+  // Feed hitbox (Inventory)
+  if (gameScreen == 4) {
+    if (feed > 0) {
+      if (abs(mouseX-400)<50 && abs(mouseY-250)<125) {
+        feed -= 1;
+        injury -= 1;
+      }
+    }
+  }
+
+  // Steroid hitbox (Shop)
   if (gameScreen == 3) {
     if (abs(mouseX-550)<50 && abs(mouseY-250)<125) {
       steroids += 1;
@@ -382,13 +447,16 @@ void mouseReleased() {
     }
   }
 
-  // Antibiotics hitbox
-  if (gameScreen == 3) {
-    if (abs(mouseX-700)<50 && abs(mouseY-250)<125) {
-      antibiotics += 1;
-      money -= 500;
+  // Steroid hitbox (Inventory)
+  if (gameScreen == 4) {
+    if (steroids > 0) {
+      if (abs(mouseX-550)<50 && abs(mouseY-250)<125) {
+        steroids -= 1;
+        steroidsUsed = true;
+      }
     }
   }
+
 
   // Charm hitbox
   if (gameScreen == 3) {
@@ -600,6 +668,11 @@ void fight() {
 
   if (gameScreen == 7) {
     fill(255);
+    textFont(text, 28);
+    text("Money: $" +money, 100, 40);
+    debt();
+
+    fill(255);
     text("" +roosterName, 150, 200);
     image(rooster[roosterGen], 150, 450, 200, 200);
 
@@ -623,17 +696,21 @@ void fight() {
 
 // Generates match results (win or loss)
 void matchResults() {
+  healthStates();
 
-  if (abs(random(101)-totalSkill)<50) {
+  float chance = random(2);
+
+  if (abs(chance-totalSkill)>0.5) {
     matchWon = true;
     matchLost = false;
   }
-  if (abs(random(101)-totalSkill)>=50) {
+  if (abs(chance-totalSkill)<=0.5) {
     matchWon = false;
     matchLost = true;
   }
   if (matchWon == true) {
     if (matchLost == false) {
+      playerSkill += 0.01;
       money = money + betMoney*2;
       textFont(title, 48);
       fill(#35AA51);
@@ -658,5 +735,54 @@ void matchResults() {
 void winEnding() {
   if (money >+ 10000) {
     gameScreen = 9;
+  }
+}
+
+void totalSkill() {
+
+  totalSkill = baseSkill + playerSkill;
+}
+
+void steroidsUsed() {
+  if (steroidsUsed == true) {
+    playerSkill += 0.01;
+    steroidsUsed = false;
+    noLoop();
+  }
+}
+
+void healthStates() {
+
+  if (matchWon || matchLost) {
+    float chance = random(2);
+
+    if (abs(chance-0.5)<0.5) {
+      injury += 1;
+      matchWon = false;
+      matchLost = false;
+    }
+
+    if (injury == 1) {
+      totalSkill -= 0.2;
+      if (gameScreen == 5) {
+        textFont(text, 28);
+        fill(#C92020);
+        text("Injured", 600, 500);
+      }
+
+      if (gameScreen == 8) {
+        textFont(text, 28);
+        fill(#C92020);
+        text("Your rooster is injured!", 600, 550);
+      }
+    }
+
+    if (feed > 1) {
+      injury = 1;
+    }
+
+    if (feed < 0) {
+      injury = 0;
+    }
   }
 }
