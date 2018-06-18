@@ -32,10 +32,10 @@ int gameScreen;
 int money;
 int betMoney;
 
-int injury;
-
 int roosterPic;
 int roosterGen;
+
+int hunger;
 
 float baseSkill;
 float playerSkill;
@@ -51,8 +51,12 @@ int nameGen;
 Boolean debtEnding;
 Boolean winEnding;
 
+String hungerState;
+
 Boolean matchWon;
 Boolean matchLost;
+
+Boolean injury;
 
 Boolean feedUsed;
 Boolean steroidsUsed;
@@ -96,11 +100,12 @@ void setup() {
   steroidsUsed = false;
   baseSkill = 0.5;
   playerSkill = 0;
+  hunger = 0;
 
-  injury = 0;
+  injury = false;
 
   ending = "null";
-
+  hungerState = "null";
 
   feedUsed = false;
   steroidsUsed = false;
@@ -249,7 +254,6 @@ void draw() {
   // Inventory Screen
   if (gameScreen == 4) {
     steroidsUsed();
-    healthStates();
 
     fill(255);
     textFont(text, 28);
@@ -296,9 +300,9 @@ void draw() {
     roosterAppearance();
     steroidsUsed();
     totalSkill();
-    healthStates();
+    hunger();
 
-    fill(255);
+      fill(255);
     textFont(text, 28);
     text("Money: $" +money, 100, 40);
     debt();
@@ -343,7 +347,7 @@ void draw() {
   }
 
   if (gameScreen == 7) {
-
+    hunger();
     textFont(text, 28);
     fill(255);
     rect(1000, 90, 150, 50);
@@ -431,11 +435,9 @@ void mouseReleased() {
 
   // Feed hitbox (Inventory)
   if (gameScreen == 4) {
-    if (feed > 0) {
-      if (abs(mouseX-400)<50 && abs(mouseY-250)<125) {
-        feed -= 1;
-        injury -= 1;
-      }
+    if (abs(mouseX-400)<50 && abs(mouseY-250)<125) {
+      feed -= 1;
+      hunger -= 1;
     }
   }
 
@@ -696,7 +698,7 @@ void fight() {
 
 // Generates match results (win or loss)
 void matchResults() {
-  healthStates();
+  hunger();
 
   float chance = random(2);
 
@@ -747,42 +749,39 @@ void steroidsUsed() {
   if (steroidsUsed == true) {
     playerSkill += 0.01;
     steroidsUsed = false;
-    noLoop();
   }
 }
 
-void healthStates() {
+// Function that adds hunger everytime the rooster fights
+void hunger() {
 
-  if (matchWon || matchLost) {
-    float chance = random(2);
+  if (matchWon == true || matchLost == true) {
+    hunger += 1;
+  }
 
-    if (abs(chance-0.5)<0.5) {
-      injury += 1;
-      matchWon = false;
-      matchLost = false;
-    }
-
-    if (injury == 1) {
+  if (hunger >= 3) {
+    if (gameScreen == 5 || gameScreen == 7) {
       totalSkill -= 0.2;
-      if (gameScreen == 5) {
-        textFont(text, 28);
-        fill(#C92020);
-        text("Injured", 600, 500);
-      }
-
-      if (gameScreen == 8) {
-        textFont(text, 28);
-        fill(#C92020);
-        text("Your rooster is injured!", 600, 550);
-      }
+      textFont(text, 28);
+      fill(#D11717);
+      text("Your rooster is " +hungerState, 600, 450);
+      text("They are less effective in combat", 600, 500);
     }
+  }
 
-    if (feed > 1) {
-      injury = 1;
-    }
+  if (hunger == 3) {
+    hungerState = "hungry";
+  }
 
-    if (feed < 0) {
-      injury = 0;
-    }
+  if (hunger == 4) {
+    hungerState = "Starving";
+  }
+
+  if (hunger == 5) {
+    hungerState = "Malnourished";
+  }
+
+  if (hunger == 6) {
+    gameScreen = 11;
   }
 }
