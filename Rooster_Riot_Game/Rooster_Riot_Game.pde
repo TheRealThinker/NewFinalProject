@@ -1,3 +1,5 @@
+import processing.sound.*;
+
 // Rooster Riot
 // Made by Sam
 
@@ -5,7 +7,6 @@ PImage[] rooster = new PImage[8];
 PImage storeKeep;
 PImage startRooster;
 PImage enemyRooster;
-PImage farmer;
 PImage fightVS;
 PImage arrow;
 
@@ -14,9 +15,6 @@ int feed;
 
 PImage steroidpic;
 int steroids;
-
-PImage antibioticspic;
-int antibiotics;
 
 PImage charm;
 int charms;
@@ -56,25 +54,25 @@ String hungerState;
 Boolean matchWon;
 Boolean matchLost;
 
-Boolean injury;
-
 Boolean feedUsed;
 Boolean steroidsUsed;
 
-
-
+SoundFile file;
+String audioName = "More Gun 1 hour-Team Fortress 2 song.mp3";
+String path;
 
 
 void setup() {
+  path = sketchPath(audioName);
+  file = new SoundFile(this, path);
+  file.play();
 
   storeKeep = loadImage("chadrooster.png");
   startRooster = loadImage("startrooster.png");
   enemyRooster = loadImage("enemyrooster.jpg");
   feedpic = loadImage("feed.png");
   steroidpic = loadImage("steroids.jpeg");
-  antibioticspic = loadImage("antibiotics.jpg");
   charm = loadImage("charm.jpg");
-  farmer = loadImage("farmer.jpg");
   fightVS = loadImage("vs.jpg");
   arrow = loadImage("rightarrow.png");
   chateau = loadImage("chateau.jpg");
@@ -95,19 +93,14 @@ void setup() {
   money = 1500;
   feed = 3;
   steroids = 0;
-  antibiotics = 2;
   charms = 0;
-  steroidsUsed = false;
   baseSkill = 0.5;
   playerSkill = 0;
   hunger = 0;
 
-  injury = false;
-
   ending = "null";
   hungerState = "null";
 
-  feedUsed = false;
   steroidsUsed = false;
 
   debtEnding = false;
@@ -236,13 +229,6 @@ void draw() {
     text("Increases skill", 550, 400);
     text("Inventory: " +steroids, 550, 450);
 
-    image(antibioticspic, 700, 250, 100, 100);
-    textFont(desc, 18);
-    text("Antibiotics", 700, 350);
-    text("$500", 700, 375);
-    text("Cures infection", 700, 400);
-    text("Inventory: " +antibiotics, 700, 450);
-
     image(charm, 850, 250, 100, 100);
     textFont(desc, 18);
     text("Charm", 850, 350);
@@ -284,12 +270,6 @@ void draw() {
     text("Inventory: " +steroids, 550, 375);
 
     fill(255);
-    image(antibioticspic, 700, 250, 100, 100);
-    textFont(desc, 18);
-    text("Antibiotics", 700, 350);
-    text("Inventory: " +antibiotics, 700, 375);
-
-    fill(255);
     image(charm, 850, 250, 100, 100);
     textFont(desc, 18);
     text("Charm", 850, 350);
@@ -302,7 +282,7 @@ void draw() {
     totalSkill();
     hunger();
 
-      fill(255);
+    fill(255);
     textFont(text, 28);
     text("Money: $" +money, 100, 40);
     debt();
@@ -393,10 +373,40 @@ void draw() {
         money = 1500;
         feed = 3;
         steroids = 0;
-        antibiotics = 2;
+        playerSkill = 0;
         betMoney = 0;
         nameGen = 0;
         roosterGen = 0;
+        hunger = 0;
+        ending = "null";
+        debtEnding = false;
+        matchWon = false;
+        matchLost = false;
+        winEnding = false;
+        clear();
+      }
+    }
+  }
+
+  if (gameScreen == 11) {
+    loop();
+    textFont(title, 60);
+    fill(#AD2D2D);
+    text("YOU LOSE!", 600, 50);
+    text("Reason: " +ending, 600, 350);
+    text("Press r to try again", 600, 550);
+
+    if (keyPressed) {
+      if (key == 'r' || key == 'R') {
+        gameScreen = 0;
+        money = 1500;
+        feed = 3;
+        steroids = 0;
+        playerSkill = 0;
+        betMoney = 0;
+        nameGen = 0;
+        roosterGen = 0;
+        hunger = 0;
         ending = "null";
         debtEnding = false;
         matchWon = false;
@@ -436,8 +446,10 @@ void mouseReleased() {
   // Feed hitbox (Inventory)
   if (gameScreen == 4) {
     if (abs(mouseX-400)<50 && abs(mouseY-250)<125) {
-      feed -= 1;
-      hunger -= 1;
+      if (feed > 0) {
+        feed -= 1;
+        hunger -= 1;
+      }
     }
   }
 
@@ -472,6 +484,7 @@ void mouseReleased() {
   if (gameScreen == 3 || gameScreen == 4 || gameScreen == 5 || gameScreen == 6 || gameScreen == 7 || gameScreen == 8) {
     if (abs(mouseX-1075)<75 && abs(mouseY-90)<50) {
       gameScreen = 2;
+      money = money + betMoney;
       betMoney -= betMoney;
       loop();
       clear();
@@ -559,6 +572,7 @@ void mouseReleased() {
     // Fight! button
     if (abs(mouseX-600)<100 && abs(mouseY-600)<100) {
       gameScreen = 8;
+      hunger += 1;
     }
   }
 }
@@ -700,34 +714,37 @@ void fight() {
 void matchResults() {
   hunger();
 
-  float chance = random(2);
+  if (gameScreen == 8) {
 
-  if (abs(chance-totalSkill)>0.5) {
-    matchWon = true;
-    matchLost = false;
-  }
-  if (abs(chance-totalSkill)<=0.5) {
-    matchWon = false;
-    matchLost = true;
-  }
-  if (matchWon == true) {
-    if (matchLost == false) {
-      playerSkill += 0.01;
-      money = money + betMoney*2;
-      textFont(title, 48);
-      fill(#35AA51);
-      text("Match result: WON", 600, 250);
-      text("You now have $" +money, 600, 400);
+    float chance = random(2);
+
+    if (abs(chance-totalSkill)>0.5) {
+      matchWon = true;
+      matchLost = false;
     }
-  }
-  if (matchWon == false) {
-    if (matchLost == true) {
-      betMoney = 0;
-      textFont(title, 48);
-      fill(#C62A35);
-      text("Match result: LOST", 600, 250);
-      text("You lost your betting money!", 600, 400);
-      text("Better luck next time.", 600, 500);
+    if (abs(chance-totalSkill)<=0.5) {
+      matchWon = false;
+      matchLost = true;
+    }
+    if (matchWon == true) {
+      if (matchLost == false) {
+        playerSkill += 0.01;
+        money = money + betMoney*2;
+        textFont(title, 48);
+        fill(#35AA51);
+        text("Match result: WON", 600, 250);
+        text("You now have $" +money, 600, 400);
+      }
+    }
+    if (matchWon == false) {
+      if (matchLost == true) {
+        betMoney = 0;
+        textFont(title, 48);
+        fill(#C62A35);
+        text("Match result: LOST", 600, 250);
+        text("You lost your betting money!", 600, 400);
+        text("Better luck next time.", 600, 500);
+      }
     }
   }
   noLoop();
@@ -755,17 +772,20 @@ void steroidsUsed() {
 // Function that adds hunger everytime the rooster fights
 void hunger() {
 
-  if (matchWon == true || matchLost == true) {
-    hunger += 1;
-  }
-
   if (hunger >= 3) {
-    if (gameScreen == 5 || gameScreen == 7) {
-      totalSkill -= 0.2;
+    totalSkill -= 0.2;
+    if (gameScreen == 5) {
       textFont(text, 28);
       fill(#D11717);
       text("Your rooster is " +hungerState, 600, 450);
       text("They are less effective in combat", 600, 500);
+    }
+
+    if (gameScreen == 7) {
+      textFont(text, 28);
+      fill(#D11717);
+      text("Your rooster is " +hungerState, 600, 150);
+      text("They are less effective in combat", 600, 200);
     }
   }
 
@@ -782,6 +802,7 @@ void hunger() {
   }
 
   if (hunger == 6) {
+    ending = "Your rooster died of hunger";
     gameScreen = 11;
   }
 }
